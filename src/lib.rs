@@ -29,6 +29,12 @@ lazy_static! {
     let re = Regex::new(r#"^(?i)rr\?$|^(w[h]?at|wtf)('s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?[\?\.]?$|(?<!")(?<! is |did )(w[h]?at|wtf)('s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?(?!outine| \w)[\?\.]?(?!")|define rr[\?\.]?"#).unwrap();
     re
   };
+  static ref REPLY: String = {
+    "The RR is the [Recommended Routine](https://www.reddit.com/r/bodyweightfitness/wiki/kb/recommended_routine).\n*****\n^(I am a bot, flex-beep-boop)".to_string()
+  };
+  static ref GOOD_BOT: String = {
+    "good bot".to_string()
+  };
 }
 
 pub fn run() -> Result<()> {
