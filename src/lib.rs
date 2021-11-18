@@ -1,4 +1,6 @@
 extern crate orca;
+use orca::data::Comment;
+use orca::data::Listing;
 use orca::{App, Sort};
 use serde::Deserialize;
 use serde_json::Result;
@@ -38,6 +40,10 @@ impl Post {
 
     Ok(post)
   }
+  pub fn comments(&self, reddit: &App) -> Listing<Comment> {
+    let comments = reddit.get_comment_tree(&self.id).unwrap();
+    comments
+  }
 }
 
 lazy_static! {
@@ -53,25 +59,27 @@ lazy_static! {
   };
 }
 
-fn init_reddit() -> App {
+fn init_app() -> (App, Config) {
   let contents = fs::read_to_string("config.json").expect("Error reading config file");
   let config = Config::new(&contents).unwrap();
-  let mut reddit = App::new("Linux:com.jasonmichaeladams.rrbot", "0.1", "u/spaceyjase").unwrap();
+  let mut reddit = App::new("Linux:com.jasonmichaeladams.rrbot", "0.2", "u/spaceyjase").unwrap();
   reddit.authorize_script(&config.client_id, &config.client_secret, &config.username, &config.password).unwrap();
-  reddit
+  (reddit, config)
 }
 
 pub fn run() -> Result<()> {
-  let reddit = init_reddit();
-
+  let (reddit, config) = init_app();
   let posts = reddit.get_posts("bodyweightfitness", Sort::Hot).unwrap();
+
+  let mut count = 0;
   for json in posts["data"]["children"].as_array().unwrap() {
+    if count > config.hot_take { break };
     let post = Post::new(&json["data"].to_string()).unwrap();
     println!("{}:{}", post.id, post.title);
-    let comments = reddit.get_comment_tree(&post.id).unwrap();
-    for comment in comments {
+    for comment in post.comments(&reddit) {
       println!("\t- {}", comment.body);
     }
+    count += 1;
   }
 
   Ok(())
