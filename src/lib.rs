@@ -73,7 +73,7 @@ pub fn run() -> Result<()> {
 
   let mut count = 0;
   for json in posts["data"]["children"].as_array().unwrap() {
-    if count > config.hot_take { break };
+    if count > config.hot_take { break }
     let post = Post::new(&json["data"].to_string()).unwrap();
     println!("{}:{}", post.id, post.title);
     for comment in post.comments(&reddit) {
