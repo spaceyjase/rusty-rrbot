@@ -41,7 +41,7 @@ impl Post {
     Ok(post)
   }
   pub fn comments(&self, reddit: &App) -> Listing<Comment> {
-    let comments = reddit.get_comment_tree(&self.id).unwrap();
+    let comments = reddit.get_comment_tree(&self.id).unwrap_or_default();
     comments
   }
 }
