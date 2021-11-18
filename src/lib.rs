@@ -41,7 +41,7 @@ impl Post {
 
 lazy_static! {
   static ref RE: Regex = {
-    let re = Regex::new(r#"^(?i)rr\?$|^(w[h]?at|wtf)('s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?[\?\.]?$|(?<!")(?<! is |did )(w[h]?at|wtf)('s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?(?!outine| \w)[\?\.]?(?!")|define rr[\?\.]?"#).unwrap();
+    let re = Regex::new(r#"^(?i)rr\?$|^(w[h]?at|wtf)([`']s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?[\?\.]?$|(?<!")(?<! is |did )(w[h]?at|wtf)('s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?(?!outine| \w)[\?\.]?(?!")|define rr[\?\.]?"#).unwrap();
     re
   };
   static ref REPLY: String = {
@@ -384,6 +384,18 @@ mod tests {
   #[test]
   fn test_regex_match_text_no_match() {
     let query = "define nothing rr    ggsddg".to_string();
+    assert!(!RE.is_match(&query).unwrap());
+  }
+
+  #[test]
+  fn test_regex_match_odd_quote_text_match() {
+    let query = "what`s the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
+  }
+
+  #[test]
+  fn test_regex_match_odd_quote_text_no_match() {
+    let query = r#""what`s the rr?""#.to_string();
     assert!(!RE.is_match(&query).unwrap());
   }
 }
