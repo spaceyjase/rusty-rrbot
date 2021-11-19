@@ -5,6 +5,7 @@ use orca::{App, Sort};
 use serde::Deserialize;
 use serde_json::Result;
 use std::fs;
+use std::cmp;
 use fancy_regex::Regex;
 
 #[macro_use]
@@ -71,15 +72,14 @@ pub fn run() -> Result<()> {
   let (reddit, config) = init_app();
   let posts = reddit.get_posts("bodyweightfitness", Sort::Hot).unwrap();
 
-  let mut count = 0;
-  for json in posts["data"]["children"].as_array().unwrap() {
-    if count > config.hot_take { break }
+  let posts = posts["data"]["children"].as_array().unwrap();
+  let count = cmp::min(posts.len(), config.hot_take as usize);
+  for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string()).unwrap();
     println!("{}:{}", post.id, post.title);
     for comment in post.comments(&reddit) {
       println!("\t- {}", comment.body);
     }
-    count += 1;
   }
 
   Ok(())
