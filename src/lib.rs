@@ -42,8 +42,7 @@ impl Post {
     Ok(post)
   }
   pub fn comments(&self, reddit: &App) -> Listing<Comment> {
-    let comments = reddit.get_comment_tree(&self.id).unwrap_or_default();
-    comments
+    reddit.get_comment_tree(&self.id).unwrap_or_default()
   }
 }
 
@@ -76,9 +75,13 @@ pub fn run() -> Result<()> {
   for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string()).unwrap();
     println!("{}:{}", post.id, post.title);
-    for comment in post.comments(&reddit) {
-      println!("\t- {}", comment.body);
-    }
+    post
+      .comments(&reddit)
+      .filter(|comment| {
+        let body = comment.body.as_str();
+        RE.is_match(body).unwrap_or(false)
+      })
+      .for_each(|comment| println!("\t- matched: {}{}", comment.id, comment.body));
   }
 
   Ok(())
