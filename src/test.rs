@@ -1,4 +1,4 @@
-use super::*;
+use super::{Config, Post, RE};
 
 #[test]
 fn test_config_parse() {
