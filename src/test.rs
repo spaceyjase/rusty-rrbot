@@ -1,4 +1,6 @@
-use super::{Config, Post, RE};
+use crate::post::RE;
+use crate::post::Post;
+use super::{Config};
 
 #[test]
 fn test_config_parse() {
