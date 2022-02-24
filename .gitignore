@@ -1,2 +1,6 @@
 /target
 config.json
+
+comments_replied_to.db
+posts_replied_to.db
+inbox_replied_to.db
