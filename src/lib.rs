@@ -44,6 +44,25 @@ impl Post {
   pub fn comments(&self, reddit: &App) -> Listing<Comment> {
     reddit.get_comment_tree(&self.id).unwrap_or_default()
   }
+  pub fn is_match(&self) -> Result<bool> {
+    self.is_text_match(&self.selftext)
+  }
+  pub fn get_matching_comments(&self, listing: Listing<Comment>) -> Result<Vec<String>> {
+    let mut results = Vec::new();
+    for comment in listing {
+      if self.is_text_match(&comment.body).unwrap_or(false) {
+        results.push(comment.id);
+      }
+      results.append(&mut self.get_matching_comments(comment.replies).unwrap());
+    }
+    Ok(results)
+  }
+  fn is_text_match(&self, text: &str) -> Result<bool> {
+    if RE.is_match(&text).unwrap_or(false) {
+      return Ok(true)
+    }
+    Ok(false)
+  }
 }
 
 lazy_static! {
@@ -74,14 +93,13 @@ pub fn run() -> Result<()> {
   let count = cmp::min(posts.len(), config.hot_take as usize);
   for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string()).unwrap();
-    println!("{}:{}", post.id, post.title);
-    post
-      .comments(&reddit)
-      .filter(|comment| {
-        let body = comment.body.as_str();
-        RE.is_match(body).unwrap_or(false)
-      })
-      .for_each(|comment| println!("\t- matched: {}{}", comment.id, comment.body));
+    if post.is_match().unwrap() {
+      println!("Matched! {}", post.id);
+    }
+    post.get_matching_comments(post.comments(&reddit)).unwrap().iter().for_each(|id| {
+      //reddit.reply(&id, &REPLY).unwrap();
+      println!("Matched! {}", id);
+    });
   }
 
   Ok(())
