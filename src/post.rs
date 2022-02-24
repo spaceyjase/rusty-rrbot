@@ -32,12 +32,10 @@ impl Post {
   }
   pub fn get_matching_comments(&self, listing: Listing<Comment>) -> Result<Vec<String>> {
     let mut results = Vec::new();
-    for comment in listing {
-      if self.is_text_match(&comment.body).unwrap_or(false) {
-        results.push(comment.id);
-      }
-      results.append(&mut self.get_matching_comments(comment.replies).unwrap());
-    }
+    listing
+      .filter(|comment| self.is_text_match(&comment.body).unwrap_or(false))
+      .for_each(|comment| results.push(comment.id));
+
     Ok(results)
   }
   fn is_text_match(&self, text: &str) -> Result<bool> {
