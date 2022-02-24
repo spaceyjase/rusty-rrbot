@@ -8,6 +8,9 @@ pub struct Config {
   pub username: String,
   pub password: String,
   pub hot_take: u8,
+  pub inbox_db_filename: String,
+  pub posts_db_filename: String,
+  pub comments_db_filename: String,
 }
 
 impl Config {

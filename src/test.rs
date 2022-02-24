@@ -12,7 +12,10 @@ fn test_config_parse() {
       "client_secret": "client_secret",
       "username": "username",
       "password": "password",
-      "hot_take": 50
+      "hot_take": 50,
+      "inbox_db_filename": "inbox.db",
+      "posts_db_filename": "posts.db",
+      "comments_db_filename": "comments.db"
     }
   "#;
 
@@ -23,6 +26,9 @@ fn test_config_parse() {
   assert_eq!(config.username, "username");
   assert_eq!(config.password, "password");
   assert_eq!(config.hot_take, 50);
+  assert_eq!(config.inbox_db_filename, "inbox.db");
+  assert_eq!(config.posts_db_filename, "posts.db");
+  assert_eq!(config.comments_db_filename, "comments.db");
 }
 
 #[test]
