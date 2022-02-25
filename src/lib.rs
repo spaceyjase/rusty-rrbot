@@ -1,4 +1,3 @@
-extern crate orca;
 use crate::reddit::RedditApp;
 use crate::reddit::Reddit;
 use crate::post::Post;
