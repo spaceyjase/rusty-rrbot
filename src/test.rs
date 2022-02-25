@@ -1,12 +1,12 @@
+use crate::config::Config;
 use serde_json::Value;
 use orca::Sort;
 use failure::Error;
-use crate::RedditApp;
+use crate::reddit::RedditApp;
 use orca::data::Comment;
 use orca::data::Listing;
 use crate::post::RE;
 use crate::post::Post;
-use super::{Config};
 
 struct RedditMock
 {

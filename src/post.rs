@@ -1,4 +1,4 @@
-use crate::RedditApp;
+use crate::reddit::RedditApp;
 use fancy_regex::Regex;
 use orca::data::Comment;
 use orca::data::Listing;

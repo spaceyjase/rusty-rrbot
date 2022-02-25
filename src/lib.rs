@@ -1,16 +1,14 @@
 extern crate orca;
-use serde_json::Value;
-use orca::data::Listing;
-use orca::data::Comment;
-use crate::config::Config;
+use crate::reddit::RedditApp;
+use crate::reddit::Reddit;
 use crate::post::Post;
-use orca::{App, Sort};
+use orca::{Sort};
 use failure::Error;
-use std::fs;
 use std::cmp;
 
 mod post;
 mod config;
+mod reddit;
 
 #[macro_use]
 extern crate lazy_static;
@@ -22,39 +20,6 @@ lazy_static! {
   static ref GOOD_BOT: String = {
     "good bot".to_string()
   };
-}
-
-pub struct Reddit {
-  reddit: App,
-  config: Config,
-}
-
-impl Reddit {
-  pub fn new() -> Reddit {
-    let contents = fs::read_to_string("config.json").expect("Error reading config file");
-    let config = Config::new(&contents).unwrap();
-    let mut reddit = App::new("Linux:com.jasonmichaeladams.rrbot", "0.2", "u/spaceyjase").unwrap();
-    reddit.authorize_script(&config.client_id, &config.client_secret, &config.username, &config.password).unwrap();
-    Reddit{ reddit, config }
-  }
-}
-
-pub trait RedditApp {
-  fn get_posts(&self, sub: &str, sort: Sort) -> Result<Value, Error>;
-  fn get_comment_tree(&self, post_id: &str) -> Result<Listing<Comment>, Error>;
-}
-
-impl RedditApp for Reddit {
-  fn get_comment_tree(self: &Reddit, post_id: &str) -> Result<Listing<Comment>, Error> {
-    self.reddit.get_comment_tree(post_id)
-  }
-  fn get_posts(&self, sub: &str, sort: Sort) -> Result<Value, Error> {
-    self.reddit.get_posts(sub, sort)
-  }
-}
-
-impl Default for Reddit {
-  fn default() -> Self { Option::<Self>::None.unwrap() }
 }
 
 pub fn run() -> Result<(), Error> {
