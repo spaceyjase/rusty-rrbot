@@ -2,7 +2,6 @@ extern crate orca;
 use crate::reddit::RedditApp;
 use crate::reddit::Reddit;
 use crate::post::Post;
-use orca::{Sort};
 use failure::Error;
 use std::cmp;
 
@@ -24,7 +23,7 @@ lazy_static! {
 
 pub fn run() -> Result<(), Error> {
   let app = Reddit::new();
-  let posts = app.get_posts("bodyweightfitness", Sort::Hot).unwrap();
+  let posts = app.get_posts().unwrap();
 
   let posts = posts["data"]["children"].as_array().unwrap();
   let count = cmp::min(posts.len(), app.config.hot_take as usize);

@@ -23,16 +23,16 @@ impl Reddit {
 }
 
 pub trait RedditApp {
-  fn get_posts(&self, sub: &str, sort: Sort) -> Result<Value, Error>;
   fn get_comment_tree(&self, post_id: &str) -> Result<Listing<Comment>, Error>;
+  fn get_posts(&self) -> Result<Value, Error>;
 }
 
 impl RedditApp for Reddit {
   fn get_comment_tree(self: &Reddit, post_id: &str) -> Result<Listing<Comment>, Error> {
     self.reddit.get_comment_tree(post_id)
   }
-  fn get_posts(&self, sub: &str, sort: Sort) -> Result<Value, Error> {
-    self.reddit.get_posts(sub, sort)
+  fn get_posts(&self) -> Result<Value, Error> {
+    self.reddit.get_posts("bodyweightfitness", Sort::Hot)
   }
 }
 

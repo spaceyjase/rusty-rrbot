@@ -1,6 +1,5 @@
 use crate::config::Config;
 use serde_json::Value;
-use orca::Sort;
 use failure::Error;
 use crate::reddit::RedditApp;
 use orca::data::Comment;
@@ -24,7 +23,7 @@ impl RedditApp for RedditMock {
   fn get_comment_tree(self: &RedditMock, _post_id: &str) -> Result<Listing<Comment>, Error> {
     Ok(self.comments.clone())
   }
-  fn get_posts(&self, _sub: &str, _sort: Sort) -> Result<Value, Error> {
+  fn get_posts(&self) -> Result<Value, Error> {
     Ok(Value::Null)
   }
 }
