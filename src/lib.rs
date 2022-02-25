@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 use crate::reddit::RedditApp;
 use crate::reddit::Reddit;
 use crate::post::Post;
@@ -29,33 +29,35 @@ pub fn run() -> Result<(), Error> {
   let mut comments_db = fs::read_to_string(&app.config.comments_db_filename)
     .expect("Missing comments db file")   // TODO: file can be created if it doesn't exist
     .lines()
-    .map(|line| (line.to_string(), line.to_string())).collect::<HashMap<String, String>>();
+    .map(|x| x.to_string())
+    .collect::<HashSet<String>>();
   let mut posts_db = fs::read_to_string(&app.config.posts_db_filename)
     .expect("Missing posts db file")
     .lines()
-    .map(|line| (line.to_string(), line.to_string())).collect::<HashMap<String, String>>();
+    .map(|x| x.to_string())
+    .collect::<HashSet<String>>();
 
-  // get new posts and check for question matches
+  // get new posts and check for post and comment matches
   let posts = app.get_posts();
   let count = cmp::min(posts.len(), app.config.hot_take as usize);
   for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string(), &app).unwrap();
     if post.is_match().unwrap() {
-      if posts_db.contains_key(&post.id) {
+      if posts_db.contains(&post.id) {
         println!("Already replied to post {}", post.id);
       } else {
         println!("Replying to post {}", post.id);
         //reddit.reply(&id, &REPLY).unwrap();
-        posts_db.insert(post.id.to_string(), post.id.to_string());
+        posts_db.insert(post.id.to_string());
       }
     }
     post.get_matching_comments().unwrap().iter().for_each(|id| {
-      if comments_db.contains_key(id) {
+      if comments_db.contains(id) {
         println!("Already replied to comment {}", id);
       } else {
         println!("Replying to comment {}", id);
         //reddit.reply(&id, &REPLY).unwrap();
-        comments_db.insert(id.to_string(), id.to_string());
+        comments_db.insert(id.to_string());
       }
     });
   }
