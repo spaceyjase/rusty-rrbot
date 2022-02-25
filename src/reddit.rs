@@ -1,6 +1,5 @@
 
 use failure::Error;
-use serde_json::Value;
 use orca::data::Comment;
 use orca::data::Listing;
 use crate::config::Config;
@@ -24,15 +23,16 @@ impl Reddit {
 
 pub trait RedditApp {
   fn get_comment_tree(&self, post_id: &str) -> Result<Listing<Comment>, Error>;
-  fn get_posts(&self) -> Result<Value, Error>;
+  fn get_posts(&self) -> std::vec::Vec<serde_json::Value>;
 }
 
 impl RedditApp for Reddit {
   fn get_comment_tree(self: &Reddit, post_id: &str) -> Result<Listing<Comment>, Error> {
     self.reddit.get_comment_tree(post_id)
   }
-  fn get_posts(&self) -> Result<Value, Error> {
-    self.reddit.get_posts("bodyweightfitness", Sort::Hot)
+  fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
+    let posts = self.reddit.get_posts("bodyweightfitness", Sort::Hot).unwrap();
+    posts["data"]["children"].as_array().unwrap().to_vec()
   }
 }
 

@@ -1,5 +1,4 @@
 use crate::config::Config;
-use serde_json::Value;
 use failure::Error;
 use crate::reddit::RedditApp;
 use orca::data::Comment;
@@ -23,8 +22,8 @@ impl RedditApp for RedditMock {
   fn get_comment_tree(self: &RedditMock, _post_id: &str) -> Result<Listing<Comment>, Error> {
     Ok(self.comments.clone())
   }
-  fn get_posts(&self) -> Result<Value, Error> {
-    Ok(Value::Null)
+  fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
+    Vec::new()
   }
 }
 
