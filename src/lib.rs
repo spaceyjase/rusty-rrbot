@@ -62,6 +62,3 @@ pub fn run() -> Result<(), Error> {
 
   Ok(())
 }
-
-#[cfg(test)]
-mod test;
