@@ -43,18 +43,14 @@ pub fn run() -> Result<(), Error> {
   for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string(), &app).unwrap();
     if post.is_match().unwrap() {
-      if posts_db.contains(&post.id) {
-        println!("Already replied to post {}", post.id);
-      } else {
+      if !posts_db.contains(&post.id) {
         println!("Replying to post {}", post.id);
         //reddit.reply(&id, &REPLY).unwrap();
         posts_db.insert(post.id.to_string());
       }
     }
     post.get_matching_comments().unwrap().iter().for_each(|id| {
-      if comments_db.contains(id) {
-        println!("Already replied to comment {}", id);
-      } else {
+      if !comments_db.contains(id) {
         println!("Replying to comment {}", id);
         //reddit.reply(&id, &REPLY).unwrap();
         comments_db.insert(id.to_string());
