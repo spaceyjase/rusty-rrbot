@@ -1,15 +1,19 @@
+use crate::RedditApp;
 use fancy_regex::Regex;
-use orca::{App};
 use orca::data::Comment;
 use orca::data::Listing;
 use serde::Deserialize;
 use serde_json::Result;
 
 #[derive(Deserialize)]
-pub struct Post {
+pub struct Post<'a, T: RedditApp>
+where T: RedditApp,
+{
   pub id: String,
   pub title: String,
   pub selftext: String,
+  #[serde(skip_deserializing)]
+  reddit: Option<&'a T>,
 }
 
 lazy_static! {
@@ -18,21 +22,24 @@ lazy_static! {
   };
 }
 
-impl Post {
-  pub fn new(json: &str) -> Result<Post> {
-    let post: Post = serde_json::from_str(&json).expect("Error parsing json");
+impl<'a, T> Post<'a, T>
+where T: RedditApp + std::default::Default
+{
+  pub fn new(json: &str, reddit: &'a T) -> Result<Post<'a, T>> {
+    let mut post: Post<T> = serde_json::from_str(&json).expect("Error parsing json");
+    post.reddit = Option::from(reddit);
 
     Ok(post)
   }
-  pub fn comments(&self, reddit: &App) -> Listing<Comment> {
-    reddit.get_comment_tree(&self.id).unwrap_or_default()
+  pub fn comments(&self) -> Listing<Comment> {
+    self.reddit.unwrap().get_comment_tree(&self.id).unwrap_or_default()
   }
   pub fn is_match(&self) -> Result<bool> {
     self.is_text_match(&self.selftext)
   }
-  pub fn get_matching_comments(&self, listing: Listing<Comment>) -> Result<Vec<String>> {
+  pub fn get_matching_comments(&self) -> Result<Vec<String>> {
     let mut results = Vec::new();
-    listing
+    self.comments()
       .filter(|comment| self.is_text_match(&comment.body).unwrap_or(false))
       .for_each(|comment| results.push(comment.id));
 

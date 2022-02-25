@@ -919,6 +919,7 @@ dependencies = [
 name = "rrbot"
 version = "0.1.0"
 dependencies = [
+ "failure",
  "fancy-regex",
  "lazy_static",
  "orca",

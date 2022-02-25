@@ -1,8 +1,37 @@
+use serde_json::Value;
+use orca::Sort;
+use failure::Error;
+use crate::RedditApp;
 use orca::data::Comment;
 use orca::data::Listing;
 use crate::post::RE;
 use crate::post::Post;
 use super::{Config};
+
+struct RedditMock
+{
+  pub comments: Listing<Comment>,
+}
+
+impl RedditMock {
+  pub fn new(comments: Option<Listing<Comment>>) -> RedditMock {
+    let comments = comments.unwrap_or_default();
+    RedditMock{ comments }
+  }
+}
+
+impl RedditApp for RedditMock {
+  fn get_comment_tree(self: &RedditMock, _post_id: &str) -> Result<Listing<Comment>, Error> {
+    Ok(self.comments.clone())
+  }
+  fn get_posts(&self, _sub: &str, _sort: Sort) -> Result<Value, Error> {
+    Ok(Value::Null)
+  }
+}
+
+impl Default for RedditMock {
+  fn default() -> Self { Option::<Self>::None.unwrap() }
+}
 
 #[test]
 fn test_config_parse() {
@@ -140,7 +169,8 @@ fn test_post_parse() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let post = Post::new(json).unwrap();
+  let mock = RedditMock::new(Option::None);
+  let post = Post::new(json, &mock).unwrap();
   assert_eq!(post.id, "qvxrbp");
 }
 
@@ -252,7 +282,8 @@ fn test_matching_post_false() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let post = Post::new(json).unwrap();
+  let mock = RedditMock::new(Option::None);
+  let post = Post::new(json, &mock).unwrap();
   assert_eq!(post.is_match().unwrap_or(false), false);
 }
 
@@ -364,7 +395,8 @@ fn test_matching_post_true() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let post = Post::new(json).unwrap();
+  let mock = RedditMock::new(Option::None);
+  let post = Post::new(json, &mock).unwrap();
   assert_eq!(post.is_match().unwrap_or(false), true);
 }
 
@@ -477,7 +509,6 @@ fn test_comment_match_false() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let post = Post::new(json).unwrap();
   let mut listing = Listing::<Comment>::new();
   listing.children.push_back(Comment{
     edited: Option::None,
@@ -496,7 +527,9 @@ fn test_comment_match_false() {
     subreddit: "".to_string(),
     ups: 0,
   });
-  let matches = post.get_matching_comments(listing).unwrap();
+  let mock = RedditMock::new(Option::from(listing));
+  let post = Post::new(json, &mock).unwrap();
+  let matches = post.get_matching_comments().unwrap();
   assert_eq!(matches.len(), 0);
 }
 
@@ -609,7 +642,7 @@ fn test_comment_match_true() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let post = Post::new(json).unwrap();
+
   let mut listing = Listing::<Comment>::new();
   listing.children.push_back(Comment{
     edited: Option::None,
@@ -628,7 +661,9 @@ fn test_comment_match_true() {
     subreddit: "".to_string(),
     ups: 0,
   });
-  let matches = post.get_matching_comments(listing).unwrap();
+  let mock = RedditMock::new(Option::from(listing));
+  let post = Post::new(json, &mock).unwrap();
+  let matches = post.get_matching_comments().unwrap();
   assert_eq!(matches.len(), 1);
 }
 

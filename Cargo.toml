@@ -11,3 +11,4 @@ serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 lazy_static = "1.4.0"
 fancy-regex = "*"
+failure = "*"
