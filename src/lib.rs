@@ -49,13 +49,14 @@ pub fn run() -> Result<(), Error> {
         posts_db.insert(post.id.to_string());
       }
     }
-    post.get_matching_comments().unwrap().iter().for_each(|id| {
-      if !comments_db.contains(id) {
+    let reply_to = post.get_matching_comments()
+        .filter(|id| !comments_db.contains(id)).collect::<Vec<String>>();
+    reply_to.iter() // 
+      .for_each(|id| {
         println!("Replying to comment {}", id);
         //reddit.reply(&id, &REPLY).unwrap();
         comments_db.insert(id.to_string());
-      }
-    });
+      });
   }
 
   Ok(())

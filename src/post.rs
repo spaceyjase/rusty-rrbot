@@ -1,7 +1,6 @@
 use crate::reddit::RedditApp;
 use fancy_regex::Regex;
 use orca::data::Comment;
-use orca::data::Listing;
 use serde::Deserialize;
 use serde_json::Result;
 
@@ -22,6 +21,13 @@ lazy_static! {
   };
 }
 
+fn is_text_match(text: &str) -> Result<bool> {
+  if RE.is_match(&text).unwrap_or(false) {
+    return Ok(true)
+  }
+  Ok(false)
+}
+
 impl<'a, T> Post<'a, T>
 where T: RedditApp + std::default::Default
 {
@@ -31,24 +37,16 @@ where T: RedditApp + std::default::Default
 
     Ok(post)
   }
-  pub fn comments(&self) -> Listing<Comment> {
+  pub fn comments(&self) -> impl Iterator<Item=Comment> {
     self.reddit.unwrap().get_comment_tree(&self.id).unwrap_or_default()
   }
   pub fn is_match(&self) -> Result<bool> {
-    self.is_text_match(&self.selftext)
+    is_text_match(&self.selftext)
   }
-  pub fn get_matching_comments(&self) -> Result<Vec<String>> {
-    let mut results = Vec::new();
+  pub fn get_matching_comments(&self) -> impl Iterator<Item=String> {
     self.comments()
-      .filter(|comment| self.is_text_match(&comment.body).unwrap_or(false))
-      .for_each(|comment| results.push(comment.id));
-
-    Ok(results)
-  }
-  fn is_text_match(&self, text: &str) -> Result<bool> {
-    if RE.is_match(&text).unwrap_or(false) {
-      return Ok(true)
-    }
-    Ok(false)
+      .into_iter()
+      .filter(|comment| is_text_match(&comment.body).unwrap_or(false))
+      .map(|comment| comment.id)
   }
 }

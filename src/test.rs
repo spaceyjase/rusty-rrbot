@@ -527,7 +527,7 @@ fn test_comment_match_false() {
   });
   let mock = RedditMock::new(Option::from(listing));
   let post = Post::new(json, &mock).unwrap();
-  let matches = post.get_matching_comments().unwrap();
+  let matches = post.get_matching_comments().collect::<Vec<_>>();
   assert_eq!(matches.len(), 0);
 }
 
@@ -661,7 +661,7 @@ fn test_comment_match_true() {
   });
   let mock = RedditMock::new(Option::from(listing));
   let post = Post::new(json, &mock).unwrap();
-  let matches = post.get_matching_comments().unwrap();
+  let matches = post.get_matching_comments().collect::<Vec<_>>();
   assert_eq!(matches.len(), 1);
 }
 
