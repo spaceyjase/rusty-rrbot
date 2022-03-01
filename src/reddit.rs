@@ -6,6 +6,15 @@ use crate::config::Config;
 use orca::{App, Sort};
 use std::fs;
 
+lazy_static! {
+  static ref REPLY: String = {
+    "The RR is the [Recommended Routine](https://www.reddit.com/r/bodyweightfitness/wiki/kb/recommended_routine).\n*****\n^(I am a bot, flex-beep-boop)".to_string()
+  };
+  static ref GOOD_BOT: String = {
+    "good bot".to_string()
+  };
+}
+
 pub struct Reddit {
   reddit: App,
   pub config: Config,
@@ -24,6 +33,7 @@ impl Reddit {
 pub trait RedditApp {
   fn get_comment_tree(&self, post_id: &str) -> Result<Listing<Comment>, Error>;
   fn get_posts(&self) -> std::vec::Vec<serde_json::Value>;
+  fn reply(&self, id: &str) -> Result<(), Error>;
 }
 
 impl RedditApp for Reddit {
@@ -33,6 +43,9 @@ impl RedditApp for Reddit {
   fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
     let posts = self.reddit.get_posts(&self.config.sub, Sort::Hot).unwrap();
     posts["data"]["children"].as_array().unwrap().to_vec()
+  }
+  fn reply(&self, id: &str) -> Result<(), Error> {
+    self.reddit.comment(&REPLY, id)
   }
 }
 

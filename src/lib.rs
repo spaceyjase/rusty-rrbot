@@ -15,15 +15,6 @@ mod reddit;
 #[macro_use]
 extern crate lazy_static;
 
-lazy_static! {
-  static ref REPLY: String = {
-    "The RR is the [Recommended Routine](https://www.reddit.com/r/bodyweightfitness/wiki/kb/recommended_routine).\n*****\n^(I am a bot, flex-beep-boop)".to_string()
-  };
-  static ref GOOD_BOT: String = {
-    "good bot".to_string()
-  };
-}
-
 fn get_db(filename: &str) -> HashSet<String> {
   match fs::read_to_string(&filename) {
     Ok(contents) => contents
@@ -61,8 +52,13 @@ pub fn run() -> Result<(), Error> {
     if post.is_match()? {
       if !posts_db.contains(&post.id) {
         println!("Replying to post {}", post.id);
-        //reddit.reply(&id, &REPLY).unwrap();
-        posts_db.insert(post.id.to_string());
+        match app.reply(&post.id) {
+          Ok(()) => posts_db.insert(post.id.to_string()),
+          Err(e) => {
+            println!("Error replying to post {}: {}", post.id, e);
+            false
+          }
+        };
       }
     }
     post.get_matching_comments()
@@ -70,8 +66,13 @@ pub fn run() -> Result<(), Error> {
         .iter_mut()
         .for_each(|id| {
           println!("Replying to comment {}", id);
-          //reddit.reply(&id, &REPLY).unwrap();
-          comments_db.insert(id.to_string());
+          match app.reply(id) {
+            Ok(()) => comments_db.insert(id.to_string()),
+          Err(e) => {
+            println!("Error replying to comment {}: {}", id, e);
+            false
+          }
+          };
         });
   }
 
