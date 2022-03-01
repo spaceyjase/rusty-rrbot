@@ -22,20 +22,23 @@ lazy_static! {
   };
 }
 
+fn get_db(filename: &str) -> HashSet<String> {
+  match fs::read_to_string(&filename) {
+    Ok(contents) => contents
+    .lines()
+    .map(|x| x.to_string())
+    .collect::<HashSet<_>>(),
+    Err(_e) => HashSet::new(),
+  }
+}
+
 pub fn run() -> Result<(), Error> {
   let app = Reddit::new();
 
-  // get existing replied to posts
-  let mut comments_db = fs::read_to_string(&app.config.comments_db_filename)
-    .expect("Missing comments db file")   // TODO: file can be created if it doesn't exist
-    .lines()
-    .map(|x| x.to_string())
-    .collect::<HashSet<String>>();
-  let mut posts_db = fs::read_to_string(&app.config.posts_db_filename)
-    .expect("Missing posts db file")
-    .lines()
-    .map(|x| x.to_string())
-    .collect::<HashSet<String>>();
+  // get existing replied to posts, comments and inbox replies
+  let mut comments_db = get_db(&app.config.comments_db_filename);
+  let mut posts_db = get_db(&app.config.posts_db_filename);
+  //let mut inbox_db = get_db(&app.config.inbox_db_filename);
 
   // get new posts and check for post and comment matches
   let posts = app.get_posts();
