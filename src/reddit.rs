@@ -31,7 +31,7 @@ impl RedditApp for Reddit {
     self.reddit.get_comment_tree(post_id)
   }
   fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
-    let posts = self.reddit.get_posts("bodyweightfitness", Sort::Hot).unwrap();
+    let posts = self.reddit.get_posts(&self.config.sub, Sort::Hot).unwrap();
     posts["data"]["children"].as_array().unwrap().to_vec()
   }
 }

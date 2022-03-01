@@ -42,7 +42,8 @@ fn test_config_parse() {
       "hot_take": 50,
       "inbox_db_filename": "inbox.db",
       "posts_db_filename": "posts.db",
-      "comments_db_filename": "comments.db"
+      "comments_db_filename": "comments.db",
+      "sub": "sub"
     }
   "#;
 
@@ -56,6 +57,7 @@ fn test_config_parse() {
   assert_eq!(config.inbox_db_filename, "inbox.db");
   assert_eq!(config.posts_db_filename, "posts.db");
   assert_eq!(config.comments_db_filename, "comments.db");
+  assert_eq!(config.sub, "sub");
 }
 
 #[test]
@@ -850,4 +852,16 @@ fn test_regex_match_odd_quote_text_match() {
 fn test_regex_match_odd_quote_text_no_match() {
   let query = r#""what`s the rr?""#.to_string();
   assert!(!RE.is_match(&query).unwrap());
+}
+
+#[test]
+fn test_regex_match_unicode_from_test_sub() {
+  let query = r#""Yeah but what’s the RR? I should have a reply…""#.to_string();
+  assert!(RE.is_match(&query).unwrap());
+}
+
+#[test]
+fn test_regex_match_unicode_from_test_sub_match() {
+  let query = r#""Yeah but what's the RR? I should have a reply…""#.to_string();
+  assert!(RE.is_match(&query).unwrap());
 }

@@ -41,8 +41,8 @@ pub fn run() -> Result<(), Error> {
   let posts = app.get_posts();
   let count = cmp::min(posts.len(), app.config.hot_take as usize);
   for json in &posts[0..count] {
-    let post = Post::new(&json["data"].to_string(), &app).unwrap();
-    if post.is_match().unwrap() {
+    let post = Post::new(&json["data"].to_string(), &app)?;
+    if post.is_match()? {
       if !posts_db.contains(&post.id) {
         println!("Replying to post {}", post.id);
         //reddit.reply(&id, &REPLY).unwrap();

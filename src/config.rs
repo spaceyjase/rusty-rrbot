@@ -11,6 +11,7 @@ pub struct Config {
   pub inbox_db_filename: String,
   pub posts_db_filename: String,
   pub comments_db_filename: String,
+  pub sub: String,
 }
 
 impl Config {
