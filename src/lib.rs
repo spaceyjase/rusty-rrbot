@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::collections::HashSet;
 use crate::reddit::RedditApp;
 use crate::reddit::Reddit;
@@ -5,6 +6,7 @@ use crate::post::Post;
 use failure::Error;
 use std::cmp;
 use std::fs;
+use std::io::Write;
 
 mod post;
 mod config;
@@ -30,6 +32,17 @@ fn get_db(filename: &str) -> HashSet<String> {
     .collect::<HashSet<_>>(),
     Err(_e) => HashSet::new(),
   }
+}
+
+fn write_db(filename: &str, db: &HashSet<String>) {
+  let file = match File::create(filename) {
+    Err(why) => panic!("couldn't create file: {}", why),
+    Ok(file) => file,
+  };
+
+  db.into_iter().for_each(|x| {
+      writeln!(&file, "{}", x).expect("couldn't write to file");
+  });
 }
 
 pub fn run() -> Result<(), Error> {
@@ -61,6 +74,10 @@ pub fn run() -> Result<(), Error> {
           comments_db.insert(id.to_string());
         });
   }
+
+  write_db(&app.config.posts_db_filename, &posts_db);
+  write_db(&app.config.comments_db_filename, &comments_db);
+  //write_db(&app.config.inbox_db_filename, &inbox_db);
 
   Ok(())
 }
