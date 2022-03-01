@@ -25,6 +25,7 @@ impl RedditApp for RedditMock {
   fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
     Vec::new()
   }
+  fn reply(&self, _: &str) -> std::result::Result<(), failure::Error> { todo!() }
 }
 
 impl Default for RedditMock {
