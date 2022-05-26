@@ -17,7 +17,7 @@ where T: RedditApp,
 
 lazy_static! {
   pub static ref RE: Regex = {
-    Regex::new(r#"^(?i)rr\?$|^(w[h]?at|wtf)([`']s|\u{2019}s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?[\?\.]?$|(?<!")(?<! is |did )(w[h]?at|wtf)('s|\u{2019}s| is| does)? (a[n]? rr|the rr|rr)( mean| stand for| and where do i find it)?(?!outine| \w)[\?\.]?(?!")|define rr[\?\.]?"#).unwrap()
+    Regex::new(r#"^(?i)rr\?$|^(wh?at|wtf)([`']?s|\u{2019}s| is| does)? (an? rr|the rr|rr)( mean| stand for| and where do i find it)?[\?\.]?$|(?<!")(?<! is |did )(?<!that's )(wh?at|wtf)([`']?s|\u{2019}s| is| does)? (an? rr|the rr|rr)( mean| stand for| and where do i find it)?(?!outine| \w)[\?\.]?(?!")|define rr[\?\.]?"#).unwrap()
   };
 }
 

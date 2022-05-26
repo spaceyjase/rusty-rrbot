@@ -866,3 +866,27 @@ fn test_regex_match_unicode_from_test_sub_match() {
   let query = r#""Yeah but what's the RR? I should have a reply…""#.to_string();
   assert!(RE.is_match(&query).unwrap());
 }
+
+#[test]
+fn test_regex_match_from_test_dumb() {
+  let query = "Sorry i may seem dumb but whats the rr".to_string();
+  assert!(RE.is_match(&query).unwrap());
+}
+
+#[test]
+fn test_regex_match_from_test_whats_the_rr() {
+  let query = "whats the Rr".to_string();
+  assert!(RE.is_match(&query).unwrap());
+}
+
+#[test]
+fn test_regex_match_quote_from_test_whats_the_rr_no_match() {
+  let query = r#""whats the Rr""#.to_string();
+  assert!(!RE.is_match(&query).unwrap());
+}
+
+#[test]
+fn test_regex_match_quote_from_test_thats_what_the_rr_no_match() {
+  let query = r#"That's what the RR, the Primer, the Wiki, and the FAQ are for."#.to_string();
+  assert!(!RE.is_match(&query).unwrap());
+}
