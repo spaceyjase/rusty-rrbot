@@ -12,6 +12,7 @@ pub struct Config {
   pub posts_db_filename: String,
   pub comments_db_filename: String,
   pub sub: String,
+  pub dry_run: bool,
 }
 
 impl Config {

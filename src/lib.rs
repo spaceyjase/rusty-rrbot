@@ -40,13 +40,13 @@ pub fn run() -> Result<(), Error> {
   let app = Reddit::new();
 
   // get existing replied to posts, comments and inbox replies
-  let mut comments_db = get_db(&app.config.comments_db_filename);
-  let mut posts_db = get_db(&app.config.posts_db_filename);
+  let mut comments_db = get_db(&app.config().comments_db_filename);
+  let mut posts_db = get_db(&app.config().posts_db_filename);
   //let mut inbox_db = get_db(&app.config.inbox_db_filename);
 
   // get new posts and check for post and comment matches
   let posts = app.get_posts();
-  let count = cmp::min(posts.len(), app.config.hot_take as usize);
+  let count = cmp::min(posts.len(), app.config().hot_take as usize);
   for json in &posts[0..count] {
     let post = Post::new(&json["data"].to_string(), &app)?;
     if post.is_match()? {
@@ -76,8 +76,8 @@ pub fn run() -> Result<(), Error> {
         });
   }
 
-  write_db(&app.config.posts_db_filename, &posts_db);
-  write_db(&app.config.comments_db_filename, &comments_db);
+  write_db(&app.config().posts_db_filename, &posts_db);
+  write_db(&app.config().comments_db_filename, &comments_db);
   //write_db(&app.config.inbox_db_filename, &inbox_db);
 
   Ok(())

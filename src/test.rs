@@ -44,7 +44,8 @@ fn test_config_parse() {
       "inbox_db_filename": "inbox.db",
       "posts_db_filename": "posts.db",
       "comments_db_filename": "comments.db",
-      "sub": "sub"
+      "sub": "sub",
+      "dry_run": true
     }
   "#;
 
@@ -59,6 +60,7 @@ fn test_config_parse() {
   assert_eq!(config.posts_db_filename, "posts.db");
   assert_eq!(config.comments_db_filename, "comments.db");
   assert_eq!(config.sub, "sub");
+  assert_eq!(config.dry_run, true);
 }
 
 #[test]

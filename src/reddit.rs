@@ -17,7 +17,7 @@ lazy_static! {
 
 pub struct Reddit {
   reddit: App,
-  pub config: Config,
+  config: Config,
 }
 
 impl Reddit {
@@ -27,6 +27,10 @@ impl Reddit {
     let mut reddit = App::new("Linux:com.jasonmichaeladams.rrbot", "0.2", "u/spaceyjase").unwrap();
     reddit.authorize_script(&config.client_id, &config.client_secret, &config.username, &config.password).unwrap();
     Reddit{ reddit, config }
+  }
+
+  pub fn config(&self) -> &Config {
+      &self.config
   }
 }
 
@@ -45,6 +49,9 @@ impl RedditApp for Reddit {
     posts["data"]["children"].as_array().unwrap().to_vec()
   }
   fn reply(&self, id: &str) -> Result<(), Error> {
+    if self.config.dry_run {
+      return Ok(());
+    }
     self.reddit.comment(&REPLY, id)
   }
 }

@@ -3,3 +3,4 @@ config.json
 comments.db
 posts.db
 inbox.db
+*~
