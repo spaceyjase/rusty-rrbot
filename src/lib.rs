@@ -68,10 +68,10 @@ pub fn run() -> Result<(), Error> {
           println!("Replying to comment {}", id);
           match app.reply(id) {
             Ok(()) => comments_db.insert(id.to_string()),
-          Err(e) => {
-            println!("Error replying to comment {}: {}", id, e);
-            false
-          }
+            Err(e) => {
+              println!("Error replying to comment {}: {}", id, e);
+              false
+            }
           };
         });
   }
