@@ -45,7 +45,7 @@ fn test_config_parse() {
       "posts_db_filename": "posts.db",
       "comments_db_filename": "comments.db",
       "sub": "sub",
-      "dry_run": true
+      "monitor_only": true
     }
   "#;
 
@@ -60,7 +60,7 @@ fn test_config_parse() {
   assert_eq!(config.posts_db_filename, "posts.db");
   assert_eq!(config.comments_db_filename, "comments.db");
   assert_eq!(config.sub, "sub");
-  assert_eq!(config.dry_run, true);
+  assert_eq!(config.monitor_only, true);
 }
 
 #[test]

@@ -49,7 +49,7 @@ impl RedditApp for Reddit {
     posts["data"]["children"].as_array().unwrap().to_vec()
   }
   fn reply(&self, id: &str) -> Result<(), Error> {
-    if self.config.dry_run {
+    if self.config.monitor_only {
       return Ok(());
     }
     self.reddit.comment(&REPLY, id)
