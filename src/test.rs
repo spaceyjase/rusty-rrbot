@@ -892,3 +892,9 @@ fn test_regex_match_quote_from_test_thats_what_the_rr_no_match() {
   let query = r#"That's what the RR, the Primer, the Wiki, and the FAQ are for."#.to_string();
   assert!(!RE.is_match(&query).unwrap());
 }
+
+#[test]
+fn test_regex_empty_string_doesnt_match() {
+  let query: String = "".to_string();
+  assert!(!RE.is_match(&query).unwrap());
+}
