@@ -1,14 +1,12 @@
 use std::fs::File;
 use std::collections::HashSet;
-use crate::reddit::RedditApp;
-use crate::reddit::Reddit;
-use crate::post::Post;
+use crate::reddit::{RedditApp, Reddit};
+use crate::reddit::post::Post;
 use failure::Error;
 use std::cmp;
 use std::fs;
 use std::io::Write;
 
-mod post;
 mod config;
 mod reddit;
 

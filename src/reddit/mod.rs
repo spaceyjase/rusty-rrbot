@@ -1,10 +1,11 @@
-
 use failure::Error;
 use orca::data::Comment;
 use orca::data::Listing;
 use crate::config::Config;
 use orca::{App, Sort};
 use std::fs;
+
+pub mod post;
 
 lazy_static! {
   static ref REPLY: String = {
