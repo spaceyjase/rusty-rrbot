@@ -42,17 +42,15 @@ pub fn run() -> Result<(), Error> {
     let count = cmp::min(posts.len(), app.config().hot_take as usize);
     for json in &posts[0..count] {
         let post = Post::new(&json["data"].to_string(), &app)?;
-        if post.is_match()? {
-            if !posts_db.contains(&post.id) {
-                println!("Replying to post {}", post.id);
-                match app.reply(&post.id) {
-                    Ok(()) => posts_db.insert(post.id.to_string()),
-                    Err(e) => {
-                        println!("Error replying to post {}: {}", post.id, e);
-                        false
-                    }
-                };
-            }
+        if post.is_match()? && !posts_db.contains(&post.id) {
+            println!("Replying to post {}", post.id);
+            match app.reply(&post.id) {
+                Ok(()) => posts_db.insert(post.id.to_string()),
+                Err(e) => {
+                    println!("Error replying to post {}: {}", post.id, e);
+                    false
+                }
+            };
         }
         post.get_matching_comments()
             .filter(|id| !comments_db.contains(id))
