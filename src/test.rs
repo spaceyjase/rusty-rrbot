@@ -1,9 +1,10 @@
-use crate::config::Config;
-use crate::reddit::post::{Post, RE};
-use crate::reddit::RedditApp;
+use crate::{
+    config::Config,
+    reddit::post::{Post, RE},
+    reddit::RedditApp,
+};
 use failure::Error;
-use orca::data::Comment;
-use orca::data::Listing;
+use orca::data::{Comment, Listing};
 
 struct RedditMock {
     pub comments: Listing<Comment>,

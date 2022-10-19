@@ -1,11 +1,6 @@
-use crate::reddit::post::Post;
-use crate::reddit::{Reddit, RedditApp};
+use crate::reddit::{post::Post, Reddit, RedditApp};
 use failure::Error;
-use std::cmp;
-use std::collections::HashSet;
-use std::fs;
-use std::fs::File;
-use std::io::Write;
+use std::{cmp, collections::HashSet, fs, fs::File, io::Write};
 
 mod config;
 mod reddit;
@@ -49,10 +44,10 @@ pub fn run() -> Result<(), Error> {
         let post = Post::new(&json["data"].to_string(), &app)?;
         if post.is_match()? && !posts_db.contains(&post.id) {
             println!("Replying to post {}", post.id);
-            posts_db.insert(post.id.to_string());
             if let Err(e) = app.reply(&post.id) {
                 println!("Error replying to post {}: {}", post.id, e);
             }
+            posts_db.insert(post.id.to_string());
         }
         post.get_matching_comments()
             .filter(|id| !comments_db.contains(id))
@@ -60,10 +55,10 @@ pub fn run() -> Result<(), Error> {
             .iter_mut()
             .for_each(|id| {
                 println!("Replying to comment {}", id);
-                comments_db.insert(id.to_string());
                 if let Err(e) = app.reply(id) {
                     println!("Error replying to comment {}: {}", id, e);
                 };
+                comments_db.insert(id.to_string());
             });
     }
 

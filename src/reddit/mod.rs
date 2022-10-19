@@ -1,8 +1,6 @@
 use crate::config::Config;
 use failure::Error;
-use orca::data::Comment;
-use orca::data::Listing;
-use orca::{App, Sort};
+use orca::{data::Comment, data::Listing, App, Sort};
 
 pub mod post;
 

@@ -13,9 +13,11 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(config: &str) -> Result<Config, config::ConfigError> {
-        let mut settings = config::Config::default();
-        settings.merge(config::File::with_name(config))?;
-        settings.try_into()
+    pub fn new(filename: &str) -> Result<Config, config::ConfigError> {
+        let settings = config::Config::builder()
+            .add_source(config::File::with_name(filename))
+            .build()?;
+
+        settings.try_deserialize::<Config>()
     }
 }
