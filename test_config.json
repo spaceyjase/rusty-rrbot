@@ -1,0 +1,12 @@
+{
+    "client_id": "client_id",
+    "client_secret": "client_secret",
+    "username": "username",
+    "password": "password",
+    "hot_take": 50,
+    "inbox_db_filename": "inbox.db",
+    "posts_db_filename": "posts.db",
+    "comments_db_filename": "comments.db",
+    "sub": "sub",
+    "monitor_only": true
+}

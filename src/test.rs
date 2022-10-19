@@ -1,70 +1,58 @@
 use crate::config::Config;
 use crate::reddit::post::{Post, RE};
-use failure::Error;
 use crate::reddit::RedditApp;
+use failure::Error;
 use orca::data::Comment;
 use orca::data::Listing;
 
-struct RedditMock
-{
-  pub comments: Listing<Comment>,
+struct RedditMock {
+    pub comments: Listing<Comment>,
 }
 
 impl RedditMock {
-  pub fn new(comments: Option<Listing<Comment>>) -> RedditMock {
-    let comments = comments.unwrap_or_default();
-    RedditMock{ comments }
-  }
+    pub fn new(comments: Option<Listing<Comment>>) -> RedditMock {
+        let comments = comments.unwrap_or_default();
+        RedditMock { comments }
+    }
 }
 
 impl RedditApp for RedditMock {
-  fn get_comment_tree(self: &RedditMock, _post_id: &str) -> Result<Listing<Comment>, Error> {
-    Ok(self.comments.clone())
-  }
-  fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
-    Vec::new()
-  }
-  fn reply(&self, _: &str) -> std::result::Result<(), failure::Error> { todo!() }
+    fn get_comment_tree(self: &RedditMock, _post_id: &str) -> Result<Listing<Comment>, Error> {
+        Ok(self.comments.clone())
+    }
+    fn get_posts(&self) -> std::vec::Vec<serde_json::Value> {
+        Vec::new()
+    }
+    fn reply(&self, _: &str) -> std::result::Result<(), failure::Error> {
+        todo!()
+    }
 }
 
 impl Default for RedditMock {
-  fn default() -> Self { Option::<Self>::None.unwrap() }
+    fn default() -> Self {
+        Option::<Self>::None.unwrap()
+    }
 }
 
 #[test]
 fn test_config_parse() {
-  let config = r#"
-    {
-      "client_id": "client_id",
-      "client_secret": "client_secret",
-      "username": "username",
-      "password": "password",
-      "hot_take": 50,
-      "inbox_db_filename": "inbox.db",
-      "posts_db_filename": "posts.db",
-      "comments_db_filename": "comments.db",
-      "sub": "sub",
-      "monitor_only": true
-    }
-  "#;
+    let config = Config::new("test_config.json").unwrap();
 
-  let config = Config::new(&config).unwrap();
-
-  assert_eq!(config.client_id, "client_id");
-  assert_eq!(config.client_secret, "client_secret");
-  assert_eq!(config.username, "username");
-  assert_eq!(config.password, "password");
-  assert_eq!(config.hot_take, 50);
-  assert_eq!(config.inbox_db_filename, "inbox.db");
-  assert_eq!(config.posts_db_filename, "posts.db");
-  assert_eq!(config.comments_db_filename, "comments.db");
-  assert_eq!(config.sub, "sub");
-  assert_eq!(config.monitor_only, true);
+    assert_eq!(config.client_id, "client_id");
+    assert_eq!(config.client_secret, "client_secret");
+    assert_eq!(config.username, "username");
+    assert_eq!(config.password, "password");
+    assert_eq!(config.hot_take, 50);
+    assert_eq!(config.inbox_db_filename, "inbox.db");
+    assert_eq!(config.posts_db_filename, "posts.db");
+    assert_eq!(config.comments_db_filename, "comments.db");
+    assert_eq!(config.sub, "sub");
+    assert_eq!(config.monitor_only, true);
 }
 
 #[test]
 fn test_post_parse() {
-  let json = r#"
+    let json = r#"
     {
       "all_awardings": [],
       "allow_live_comments": false,
@@ -171,14 +159,14 @@ fn test_post_parse() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let mock = RedditMock::new(Option::None);
-  let post = Post::new(json, &mock).unwrap();
-  assert_eq!(post.id, "qvxrbp");
+    let mock = RedditMock::new(Option::None);
+    let post = Post::new(json, &mock).unwrap();
+    assert_eq!(post.id, "qvxrbp");
 }
 
 #[test]
 fn test_matching_post_false() {
-  let json = r#"
+    let json = r#"
     {
       "all_awardings": [],
       "allow_live_comments": false,
@@ -284,14 +272,14 @@ fn test_matching_post_false() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let mock = RedditMock::new(Option::None);
-  let post = Post::new(json, &mock).unwrap();
-  assert_eq!(post.is_match().unwrap_or(false), false);
+    let mock = RedditMock::new(Option::None);
+    let post = Post::new(json, &mock).unwrap();
+    assert_eq!(post.is_match().unwrap_or(false), false);
 }
 
 #[test]
 fn test_matching_post_true() {
-  let json = r#"
+    let json = r#"
     {
       "all_awardings": [],
       "allow_live_comments": false,
@@ -397,14 +385,14 @@ fn test_matching_post_true() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let mock = RedditMock::new(Option::None);
-  let post = Post::new(json, &mock).unwrap();
-  assert_eq!(post.is_match().unwrap_or(false), true);
+    let mock = RedditMock::new(Option::None);
+    let post = Post::new(json, &mock).unwrap();
+    assert_eq!(post.is_match().unwrap_or(false), true);
 }
 
 #[test]
 fn test_comment_match_false() {
-  let json = r#"
+    let json = r#"
     {
       "all_awardings": [],
       "allow_live_comments": false,
@@ -511,33 +499,33 @@ fn test_comment_match_false() {
       "whitelist_status": "all_ads",
       "wls": 6
     }"#;
-  let mut listing = Listing::<Comment>::new();
-  listing.children.push_back(Comment{
-    edited: Option::None,
-    id: "cj0z5z".to_string(),
-    body: "Hello World".to_string(),
-    author: "".to_string(),
-    downs: 0,
-    is_submitter: false,
-    link_id: "t3_qvxrbp".to_string(),
-    name: "t1_cj0z5z".to_string(),
-    parent_id: "t3_qvxrbp".to_string(),
-    replies: Listing::<Comment>::new(),
-    score: 0,
-    score_hidden: false,
-    stickied: false,
-    subreddit: "".to_string(),
-    ups: 0,
-  });
-  let mock = RedditMock::new(Option::from(listing));
-  let post = Post::new(json, &mock).unwrap();
-  let matches = post.get_matching_comments().collect::<Vec<_>>();
-  assert_eq!(matches.len(), 0);
+    let mut listing = Listing::<Comment>::new();
+    listing.children.push_back(Comment {
+        edited: Option::None,
+        id: "cj0z5z".to_string(),
+        body: "Hello World".to_string(),
+        author: "".to_string(),
+        downs: 0,
+        is_submitter: false,
+        link_id: "t3_qvxrbp".to_string(),
+        name: "t1_cj0z5z".to_string(),
+        parent_id: "t3_qvxrbp".to_string(),
+        replies: Listing::<Comment>::new(),
+        score: 0,
+        score_hidden: false,
+        stickied: false,
+        subreddit: "".to_string(),
+        ups: 0,
+    });
+    let mock = RedditMock::new(Option::from(listing));
+    let post = Post::new(json, &mock).unwrap();
+    let matches = post.get_matching_comments().collect::<Vec<_>>();
+    assert_eq!(matches.len(), 0);
 }
 
 #[test]
 fn test_comment_match_true() {
-  let json = r#"
+    let json = r#"
     {
       "all_awardings": [],
       "allow_live_comments": false,
@@ -645,255 +633,254 @@ fn test_comment_match_true() {
       "wls": 6
     }"#;
 
-  let mut listing = Listing::<Comment>::new();
-  listing.children.push_back(Comment{
-    edited: Option::None,
-    id: "cj0z5z".to_string(),
-    body: "Hello World but what is the Rr?".to_string(),
-    author: "".to_string(),
-    downs: 0,
-    is_submitter: false,
-    link_id: "t3_qvxrbp".to_string(),
-    name: "t1_cj0z5z".to_string(),
-    parent_id: "t3_qvxrbp".to_string(),
-    replies: Listing::<Comment>::new(),
-    score: 0,
-    score_hidden: false,
-    stickied: false,
-    subreddit: "".to_string(),
-    ups: 0,
-  });
-  let mock = RedditMock::new(Option::from(listing));
-  let post = Post::new(json, &mock).unwrap();
-  let matches = post.get_matching_comments().collect::<Vec<_>>();
-  assert_eq!(matches.len(), 1);
+    let mut listing = Listing::<Comment>::new();
+    listing.children.push_back(Comment {
+        edited: Option::None,
+        id: "cj0z5z".to_string(),
+        body: "Hello World but what is the Rr?".to_string(),
+        author: "".to_string(),
+        downs: 0,
+        is_submitter: false,
+        link_id: "t3_qvxrbp".to_string(),
+        name: "t1_cj0z5z".to_string(),
+        parent_id: "t3_qvxrbp".to_string(),
+        replies: Listing::<Comment>::new(),
+        score: 0,
+        score_hidden: false,
+        stickied: false,
+        subreddit: "".to_string(),
+        ups: 0,
+    });
+    let mock = RedditMock::new(Option::from(listing));
+    let post = Post::new(json, &mock).unwrap();
+    let matches = post.get_matching_comments().collect::<Vec<_>>();
+    assert_eq!(matches.len(), 1);
 }
 
 #[test]
 fn test_regex_match_rr() {
-  let query = "rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_the_rr() {
-  let query = "what is the rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what is the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_the_rr() {
-  let query = "what the rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_rr() {
-  let query = "what is rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what is rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_rr_qm() {
-  let query = "what rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_rr() {
-  let query = "what rr".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what rr".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_s_the_rr() {
-  let query = "what's the rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what's the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_s_the_rr_quoted() {
-  let query = r#""what's the rr?""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#""what's the rr?""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_s_the_rr_quoted_text() {
-  let query = r#"Sarcasm, "What's the rr?" folks snafu."#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#"Sarcasm, "What's the rr?" folks snafu."#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_s_the_rr_quoted_text_case() {
-  let query = r#""What's the RR?""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#""What's the RR?""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_s_the_rr_quoted_text_no_match() {
-  let query = r#"When somebody asks, "What is the RR?".""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#"When somebody asks, "What is the RR?".""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_the_rr_and_match() {
-  let query = "I'm new to this sub and I would like to ask for some help: What is the RR and where do I find it? ^".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "I'm new to this sub and I would like to ask for some help: What is the RR and where do I find it? ^".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_rr_with_text() {
-  let query = "can someone tell me what is rr? have i missed something?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "can someone tell me what is rr? have i missed something?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_the_rr_with_text() {
-  let query = "can someone tell me what is the rr? have i missed something?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "can someone tell me what is the rr? have i missed something?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_also_what_is_the_rr() {
-  let query = "Also, what is rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "Also, what is rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
-
 
 #[test]
 fn test_regex_match_what_is_rr_match() {
-  let query = "what is rr".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what is rr".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_wat_rr_match() {
-  let query = "wat rr".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "wat rr".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_what_is_rr_match_2() {
-  let query = "what is rr.".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what is rr.".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_rr_match() {
-  let query = "RR?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "RR?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_quote_rr_quote_no_match() {
-  let query = r#""rr?""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#""rr?""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_what_the_rr_no_match() {
-  let query = "I tried to decipher what the RR was asking me to do in a workout...".to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = "I tried to decipher what the RR was asking me to do in a workout...".to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_what_does_the_rr_match() {
-  let query = "what does the rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what does the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_what_is_the_rr_stand_for_match() {
-  let query = "what is the rr stand for?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what is the rr stand for?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_what_does_the_rr_stand_for_match() {
-  let query = "what does the rr stand for?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what does the rr stand for?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_what_does_the_rr_mean_match() {
-  let query = "what does rr mean?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what does rr mean?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_foo_define_rr_bar_match() {
-  let query = "foo define rr bar".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "foo define rr bar".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_define_rr_match() {
-  let query = "define rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "define rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_define_rr_spacing_match() {
-  let query = "define rr    ggsddg".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "define rr    ggsddg".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_text_no_match() {
-  let query = "define nothing rr    ggsddg".to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = "define nothing rr    ggsddg".to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_odd_quote_text_match() {
-  let query = "what`s the rr?".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "what`s the rr?".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_odd_quote_text_no_match() {
-  let query = r#""what`s the rr?""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#""what`s the rr?""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_unicode_from_test_sub() {
-  let query = r#""Yeah but what’s the RR? I should have a reply…""#.to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = r#""Yeah but what’s the RR? I should have a reply…""#.to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_unicode_from_test_sub_match() {
-  let query = r#""Yeah but what's the RR? I should have a reply…""#.to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = r#""Yeah but what's the RR? I should have a reply…""#.to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_from_test_dumb() {
-  let query = "Sorry i may seem dumb but whats the rr".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "Sorry i may seem dumb but whats the rr".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_from_test_whats_the_rr() {
-  let query = "whats the Rr".to_string();
-  assert!(RE.is_match(&query).unwrap());
+    let query = "whats the Rr".to_string();
+    assert!(RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_quote_from_test_whats_the_rr_no_match() {
-  let query = r#""whats the Rr""#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#""whats the Rr""#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_match_quote_from_test_thats_what_the_rr_no_match() {
-  let query = r#"That's what the RR, the Primer, the Wiki, and the FAQ are for."#.to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query = r#"That's what the RR, the Primer, the Wiki, and the FAQ are for."#.to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
 
 #[test]
 fn test_regex_empty_string_doesnt_match() {
-  let query: String = "".to_string();
-  assert!(!RE.is_match(&query).unwrap());
+    let query: String = "".to_string();
+    assert!(!RE.is_match(&query).unwrap());
 }
